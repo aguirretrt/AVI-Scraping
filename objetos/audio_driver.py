@@ -10,10 +10,12 @@ from datetime import datetime
 from pygame import mixer, time
 
 from objetos.utils import *
+from objetos.asistente import *
 from config import COMANDOS_ACTIVACION
 
 class AudioDriver():
     COMANDO_HORA = "hora"
+    COMANDO_GOOGLE = "buscar en Google"
     COMANDO_SALIR = "salir"
     COMANDO_FINALIZAR = "finalizar"
     def __init__(self):
@@ -98,10 +100,16 @@ class AudioDriver():
             print(f'\33[K{magenta}Son las.: {ahora_local.hour} con {ahora_local.minute} minutos{gris}')
             self.texto_a_audio(f'Son las.: {ahora_local.hour} con {ahora_local.minute} minutos')
             return None
-
+        
+        elif self.texto_en_comando(self.COMANDO_GOOGLE, comando):
+            print(f'\33[K{magenta}Buscando en Google{gris}')
+            self.texto_a_audio("Usted quiere buscar en google...")  
+            texto = re.sub(self.COMANDO_GOOGLE, "", comando, flags=re.IGNORECASE).strip() 
+            return "to_google " + texto
+        
         elif self.texto_en_comando(self.COMANDO_SALIR, comando):
             print(f'\33[K{magenta}Usted dijo.: Quiero salir{gris}')
-            self.texto_a_audio("Ustde dijo que quiere salir, gracias...")
+            self.texto_a_audio("Usted dijo que quiere salir, gracias...")
             return "salir"
 
         elif self.texto_en_comando(self.COMANDO_FINALIZAR, comando):
