@@ -17,4 +17,6 @@ class TextoTerminal():
             else:
                 self.user_input = None
 
-
+    def __del__(self):
+        self.input_thread.join()  # Espera a que el hilo termine
+        exit()
