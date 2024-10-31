@@ -1,7 +1,7 @@
 USER = "aguirre.trt@gmail.com"
-PASS = "********"
+PASSWORD = "********"
 
-VISIBLE = False
+VISIBLE = True
 
 COMANDOS_ACTIVACION = [
     "asistente dime",

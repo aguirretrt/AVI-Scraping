@@ -10,33 +10,29 @@ from objetos.audio_driver import *
 from objetos.google_driver import *
 from objetos.selenium_driver import *
 
-from config import USER, PASS
+from config import USER, PASSWORD
 
 class Asistente():
     def __init__(self):        
         self.USER = USER
-        self.PASSWORD = PASS
+        self.PASSWORD = PASSWORD
         self.url = "https://chat.openai.com"
         self.robots = "https://chat.openai.com/robots.txt"
         self.COOKIES_FILE = f'{gettempdir()}/openai.cookies'
-        print(f'{azul}Iniciando Selenium Drivers{gris}')
+        print(f'{azul}Iniciando Selenium Drivers...{gris}')
         # Carga el Driver del Navegador
         self.uc = SeleniumDriver()
-        #self.uc.Driver.get("https://chat.openai.com")
         login = self.login_openai() # Login
         print()
         if not login:
-            if self.uc.virtual_display:
-                self.uc.Driver.quit()
-                self.uc.detener()
+            print(f'\33[K{rojo}INICIO FALLIDO{gris}')
             exit()
 
     def login_openai(self):
-
         print(f'\33[K{azul}Cargando Asistente...{gris}')  
         #Login por Cookies
         if path.isfile(self.COOKIES_FILE):
-            print(f'\33[K{azul}VERIFICANDO COOKIES{gris}')
+            #print(f'\33[K{azul}VERIFICANDO COOKIES{gris}')
             cookies = load(open(self.COOKIES_FILE, 'rb'))
             self.uc.Driver.get(self.robots)
             for cookie in cookies:
@@ -47,17 +43,18 @@ class Asistente():
             self.uc.Driver.get(self.url)
         else:
             #Login desde CERO
+            self.uc.Driver.get(self.url)
             self.uc.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '[data-testid="login-button"]'))).click()
             self.uc.wait.until(EC.element_to_be_clickable((By.CLASS_NAME, "social-logo"))).click()
-            self.uc.wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, 'input[type="email"]'))).send_keys(self.OPENAI_USER)
+            self.uc.wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, 'input[type="email"]'))).send_keys(self.USER)
             self.uc.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#identifierNext'))).click()
-            self.uc.wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, 'input[type="password"]'))).send_keys(self.OPENAI_PASSWORD)
+            self.uc.wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, 'input[type="password"]'))).send_keys(self.PASSWORD)
             self.uc.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#passwordNext'))).click()
 
         login = self.comprobar_login()
         # Verifica si se pudo logear correctamente
         if login:
-            print(f'\33[K{azul}COOKIE: {verde}OK{gris}')
+            #print(f'\33[K{azul}COOKIE: {verde}OK{gris}')
             dump(self.uc.Driver.get_cookies(),open(self.COOKIES_FILE,"wb"))
             return login
         else:
@@ -95,7 +92,7 @@ class Asistente():
         try:
             self.uc.Driver.click('a:contains("Historial")',  timeout=tmpo)            
         except:
-            print("No se encontro Ultima Conversacion")
+            print(f'\33[K{amarillo}No se encontro Ultima Conversacion{gris}')
 
         
     def chatear(self, prompt = None):
@@ -136,9 +133,9 @@ class Asistente():
     
     def buscar_texto_en_navegador(self, texto_a_buscar):
         try: 
+            texto_filtrado = texto_a_buscar.split("to_google ", 1)
             nav = GoogleDriver()
-            nav.Driver.get("https://google.com")
-            nav.Driver.find_element("textarea").send_keys(texto_a_buscar + "\n")     
-              
+            nav.Driver.get("https://google.com")            
+            nav.Driver.find_element("textarea").send_keys(texto_filtrado[1] + "\n")                   
         except:
             print("Ocurrió un error en la busqueda...")

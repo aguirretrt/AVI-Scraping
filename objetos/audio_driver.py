@@ -63,8 +63,6 @@ class AudioDriver():
         return False
     
     def texto_en_comando(self, texto, comando):
-        return re.search(r'\b' + texto + r'\b', comando, flags=re.IGNORECASE)
-    def texto_en_comando(self, texto, comando):
         """
         Busca y devuelve una coincidencia exacta de palabras en el texto de entrada.
 
@@ -104,9 +102,10 @@ class AudioDriver():
         elif self.texto_en_comando(self.COMANDO_GOOGLE, comando):
             print(f'\33[K{magenta}Buscando en Google{gris}')
             self.texto_a_audio("Usted quiere buscar en google...")  
-            texto = re.sub(self.COMANDO_GOOGLE, "", comando, flags=re.IGNORECASE).strip() 
-            return "to_google " + texto
-        
+            parts = comando.split(self.COMANDO_GOOGLE, 1)
+            texto = parts[1].strip()
+            return f"to_google {texto}"
+            
         elif self.texto_en_comando(self.COMANDO_SALIR, comando):
             print(f'\33[K{magenta}Usted dijo.: Quiero salir{gris}')
             self.texto_a_audio("Usted dijo que quiere salir, gracias...")
@@ -142,6 +141,7 @@ class AudioDriver():
             activar = self.activar(transcripcion)
             if activar:
                 self.texto_global = self.procesar_comando(transcripcion)
+
                 transcripcion = None
         except Exception:
             transcripcion = None # Si no reconoce el audio limpia la variable transcripcion
